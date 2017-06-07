@@ -1,0 +1,37 @@
+version: '2'
+services:
+
+    pulsar-galaxy:
+      image: bgruening/galaxy-stable
+      container_name: pulsar-galaxy
+      environment:
+        - NONUSE=reports
+        - GALAXY_CONFIG_ADMIN_USERS=youradmin@account.com
+        - GALAXY_CONFIG_BRAND=Galaxy with pulsar
+      links:
+        - pulsar-pulsar:pulsar_machine
+      depends_on:
+        - pulsar-pulsar
+      volumes_from:
+        - pulsar-galaxy-data
+      ports:
+        - "8080:80"
+
+    pulsar-pulsar:
+      image: fikipollo/pulsar
+      container_name: pulsar-pulsar
+      environment:
+        - PRIVATE_TOKEN=supersecret
+      depends_on:
+        - pulsar-galaxy-data
+      volumes_from:
+        - pulsar-galaxy-data
+      ports:
+        - "8913:8913"
+
+    pulsar-galaxy-data:
+      image: busybox
+      container_name: pulsar-galaxy-data
+      volumes:
+        - /data/test-instances/galaxy-pulsar/galaxy-data:/export
+        - /data/test-instances/galaxy-pulsar/pulsar-data:/usr/local/pulsar
